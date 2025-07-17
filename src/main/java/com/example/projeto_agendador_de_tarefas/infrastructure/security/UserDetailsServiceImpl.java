@@ -2,7 +2,7 @@ package com.example.projeto_agendador_de_tarefas.infrastructure.security;
 
 
 import com.example.projeto_agendador_de_tarefas.business.dto.UsuarioDto;
-import com.example.projeto_agendador_de_tarefas.infrastructure.client.UsuarioClient;
+import com.example.projeto_agendador_de_tarefas.infrastructure.security.client.UsuarioClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
