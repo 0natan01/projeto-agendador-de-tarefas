@@ -4,6 +4,7 @@ import com.example.projeto_agendador_de_tarefas.business.dto.TarefasDTO;
 import com.example.projeto_agendador_de_tarefas.business.mapper.TarefasConverter;
 import com.example.projeto_agendador_de_tarefas.infrastructure.enums.StatusNotificacaoEnum;
 import com.example.projeto_agendador_de_tarefas.infrastructure.entity.TarefasEntity;
+import com.example.projeto_agendador_de_tarefas.infrastructure.exceptions.ResourceNotFoundExceptions;
 import com.example.projeto_agendador_de_tarefas.infrastructure.repository.TarefasEntityRepository;
 import com.example.projeto_agendador_de_tarefas.infrastructure.security.JwtUtil;
 import lombok.AllArgsConstructor;
@@ -44,4 +45,29 @@ public class TarefasService {
 
         return tarefasConverter.paraListTarefasDTO(tarefasUsuario);
     }
+
+    public void deletarTarefaPorEmail(String id){
+        try{
+            tarefaEntityRepository.deleteById(id);
+        } catch (ResourceNotFoundExceptions e){
+            throw new ResourceNotFoundExceptions("Erro ao deletar tarefa por id" + id , e.getCause());
+        }
+    }
+
+    public TarefasDTO alteraStatus(StatusNotificacaoEnum status , String id){
+        try{
+            TarefasEntity entity = tarefaEntityRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundExceptions(
+                            "status da tarefa nao encontrado" + id)
+            );
+            entity.setStatusNotificacaoEnum(status);
+            return tarefasConverter.paraTarefasDTO(tarefaEntityRepository.save(entity));
+        } catch (ResourceNotFoundExceptions e){
+            throw new ResourceNotFoundExceptions("Nao foi possivel alterar status da tarefa",
+                    e.getCause());
+        }
+    }
+
+
+
 }
