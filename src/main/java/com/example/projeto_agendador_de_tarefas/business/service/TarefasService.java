@@ -2,6 +2,7 @@ package com.example.projeto_agendador_de_tarefas.business.service;
 
 import com.example.projeto_agendador_de_tarefas.business.dto.TarefasDTO;
 import com.example.projeto_agendador_de_tarefas.business.mapper.TarefasConverter;
+import com.example.projeto_agendador_de_tarefas.business.mapper.TarefasUpdateConverter;
 import com.example.projeto_agendador_de_tarefas.infrastructure.enums.StatusNotificacaoEnum;
 import com.example.projeto_agendador_de_tarefas.infrastructure.entity.TarefasEntity;
 import com.example.projeto_agendador_de_tarefas.infrastructure.exceptions.ResourceNotFoundExceptions;
@@ -19,6 +20,7 @@ public class TarefasService {
     private final TarefasEntityRepository tarefaEntityRepository;
     private final TarefasConverter tarefasConverter;
     private final JwtUtil jwtUtil;
+    private final TarefasUpdateConverter tarefasUpdateConverter;
 
     public TarefasDTO salvarTarefas(TarefasDTO dto , String token){
 
@@ -46,7 +48,7 @@ public class TarefasService {
         return tarefasConverter.paraListTarefasDTO(tarefasUsuario);
     }
 
-    public void deletarTarefaPorEmail(String id){
+    public void deletarTarefaPorId(String id){
         try{
             tarefaEntityRepository.deleteById(id);
         } catch (ResourceNotFoundExceptions e){
@@ -68,6 +70,16 @@ public class TarefasService {
         }
     }
 
-
-
+    public TarefasDTO updateTarefa(TarefasDTO dto , String id){
+        try{
+            TarefasEntity entity = tarefaEntityRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundExceptions("status da tarefa nao encontrado" + id)
+                    );
+            tarefasUpdateConverter.updateStatusTarefa(dto , entity);
+            return tarefasConverter.paraTarefasDTO(tarefaEntityRepository.save(entity));
+        } catch(ResourceNotFoundExceptions e){
+            throw new ResourceNotFoundExceptions("Nao foi possivel alterar status da tarefa",
+                    e.getCause());
+        }
+    }
 }
